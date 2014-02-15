@@ -26,7 +26,8 @@
 
 using namespace Snore;
 
-NotifyWidget::NotifyWidget(int pos,QWidget *parent) :
+
+NotifyWidget::NotifyWidget(int pos, int corner, QWidget *parent) :
     QWidget(parent, Qt::ToolTip | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint
             #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
             | Qt::WindowDoesNotAcceptFocus
@@ -37,7 +38,8 @@ NotifyWidget::NotifyWidget(int pos,QWidget *parent) :
     m_desktop(QDesktopWidget().availableGeometry()),
     m_id(pos),
     m_mem(QString("SnoreNotifyWidget%1").arg(QString::number(m_id))),
-    m_ready(true)
+    m_ready(true),
+    m_corner(corner)
 {
     ui->setupUi(this);
     if(m_mem.create(sizeof(SHARED_MEM_TYPE)))
@@ -65,10 +67,32 @@ NotifyWidget::NotifyWidget(int pos,QWidget *parent) :
 
     setFixedSize( m_scaler->scaled(300, 80));
 
-    m_dest = QPoint(m_desktop.topRight().x() - width(), m_desktop.topRight().y() + m_scaler->scaledY(10) + (m_scaler->scaledY(10) + height()) * pos);
-    m_start = QPoint(m_desktop.topRight().x(), m_dest.y());
-    snoreDebug( SNORE_DEBUG ) << m_dest << m_start << size();
-
+    m_dest = QPoint(m_desktop.topLeft().x(), m_desktop.topRight().y() + m_scaler->scaledY(10) + (m_scaler->scaledY(10) + height()) * pos);
+    switch(m_corner)
+    {
+    case 0:
+        m_start = QPoint(m_desktop.topLeft().x() - width(), m_dest.y());
+        m_xDir = 1;
+        m_yDir = 0;
+        break;
+    case 1:
+        m_start = QPoint(m_desktop.topLeft().x() - width(), m_dest.y());
+        m_xDir = -1;
+        m_yDir = 0;
+        break;
+    case 2:
+        m_dest = QPoint(m_desktop.bottomRight().x() - width(), m_desktop.bottomRight().y() - (m_scaler->scaledY(10) + height()) * (pos + 1));
+        m_start = QPoint(m_desktop.bottomRight().x(), m_dest.y());
+        m_xDir = -1;
+        m_yDir = 0;
+        break;
+    case 3:
+        m_dest = QPoint(m_desktop.bottomLeft().x(), m_desktop.bottomLeft().y() - (m_scaler->scaledY(10) + height()) * (pos + 1));
+        m_start = QPoint(m_desktop.bottomLeft().x() - width(), m_dest.y());
+        m_xDir = 1;
+        m_yDir = 0;
+        break;
+    }
     m_moveTimer->setInterval(1);
     connect( m_moveTimer, SIGNAL(timeout()), this, SLOT(slotMove()));
 }
@@ -82,7 +106,8 @@ NotifyWidget::~NotifyWidget()
 void NotifyWidget::display(const Notification &notification)
 {
     update(notification);
-    m_dist = 0;
+    move(m_start);
+    show();
     m_moveTimer->start();
     snoreDebug( SNORE_DEBUG ) << notification.id();
     move(m_start);
@@ -156,9 +181,8 @@ int NotifyWidget::id()
 
 void NotifyWidget::slotMove()
 {
-    QPoint dest(m_start.x() - m_dist++, m_start.y());
-    move(dest);
-    if(m_dist >= width())
+    move(pos().x() + m_xDir, pos().y() + m_yDir);
+    if(m_dest == pos())
     {
         m_moveTimer->stop();
     }

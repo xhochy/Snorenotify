@@ -41,7 +41,8 @@ SnoreNotify::SnoreNotify():
     qApp->setApplicationName("SnoreNotify");
     qApp->setOrganizationName("SnoreNotify");
     m_trayIcon = new TrayIcon();
-    m_snore = new SnoreCore(m_trayIcon->trayIcon());
+    m_snore = new SnoreCore(&m_settings, "Plugins");
+    m_snore->setTrayIcon(m_trayIcon->trayIcon());
     m_snore->loadPlugins(SnorePlugin::ALL);
     load();
     m_trayIcon->initConextMenu(m_snore);

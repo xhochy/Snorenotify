@@ -37,11 +37,10 @@
 
 using namespace Snore;
 
-
-SnoreCore::SnoreCore(QSystemTrayIcon *trayIcon )
+SnoreCore::SnoreCore(QSettings *settings, const QString &prefix)
 {
     SnoreCorePrivate::registerMetaTypes();
-    d_ptr = new SnoreCorePrivate(trayIcon );
+    d_ptr = new SnoreCorePrivate(settings, prefix);
     Q_D(SnoreCore);
     d->q_ptr = this;
 }
@@ -226,6 +225,12 @@ QSystemTrayIcon *SnoreCore::trayIcon(){
     return d->m_trayIcon;
 }
 
+void SnoreCore::setTrayIcon(QSystemTrayIcon *trayIcon)
+{
+    Q_D(SnoreCore);
+    d->m_trayIcon = trayIcon;
+}
+
 Notification SnoreCore::getActiveNotificationByID(uint id)
 {
     Q_D(SnoreCore);
@@ -246,6 +251,18 @@ bool SnoreCore::primaryBackendSupportsRichtext()
 {
     Q_D(SnoreCore);
     return d->m_notificationBackend->supportsRichtext();
+}
+
+QSettings *SnoreCore::settings()
+{
+    Q_D(SnoreCore);
+    return d->m_settings;
+}
+
+QString SnoreCore::settingsPrefix() const
+{
+    Q_D(const SnoreCore);
+    return d->m_settingsPrefix;
 }
 
 const SnoreCorePrivate *SnoreCore::d()

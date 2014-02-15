@@ -33,7 +33,8 @@ using namespace Snore;
 
 SnorePlugin::SnorePlugin ( const QString &name ) :
     m_name ( name ),
-    m_initialized(false)
+    m_initialized(false),
+    m_settings(NULL)
 {
     if(thread() != qApp->thread())
     {
@@ -55,8 +56,9 @@ bool SnorePlugin::initialize( SnoreCore *snore )
         return false;
     }
     snoreDebug( SNORE_DEBUG ) << "Initialize" << m_name << this << snore;
-    this->m_snore = snore;
+    m_snore = snore;
     m_initialized = true;
+    m_settings = snore->settings();
     return true;
 }
 
@@ -65,14 +67,68 @@ bool SnorePlugin::isInitialized()
     return m_initialized;
 }
 
-SnoreCore* SnorePlugin::snore()
+SnoreCore *SnorePlugin::snore()
 {
-    return m_snore.data();
+    return m_snore;
 }
 
 const QString &SnorePlugin::name() const
 {
     return m_name;
+}
+
+QVariant SnorePlugin::value(const QString &key)
+{
+    if(m_settings)
+    {
+        return m_settings->value(normaliseKey(key));
+    }
+    else
+    {
+        return m_fallbackSettings.value(key);
+    }
+}
+
+void SnorePlugin::setValue(const QString &key, const QVariant &value)
+{
+    if(m_settings)
+    {
+        m_settings->setValue(normaliseKey(key), value);
+    }
+    else
+    {
+        m_fallbackSettings.insert(key, value);
+    }
+}
+
+void SnorePlugin::setDefaultValue(const QString &key, const QVariant &value)
+{
+
+    if(m_settings)
+    {
+        QString pk(normaliseKey(key));
+        if(!m_settings->contains(pk))
+        {
+            m_settings->setValue(normaliseKey(key), value);
+        }
+    }
+    else
+    {
+        m_fallbackSettings.insert(key, value);
+    }
+}
+
+QString SnorePlugin::normaliseKey(const QString &key)
+{
+    const QString prefix(snore()->settingsPrefix());
+    if(!prefix.isEmpty())
+    {
+        return QString("%1/%2/%3").arg(prefix, name(), key);
+    }
+    else
+    {
+        return QString("%1/%2").arg(name(),key);
+    }
 }
 
 bool SnorePlugin::deinitialize()

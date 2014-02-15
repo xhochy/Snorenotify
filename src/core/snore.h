@@ -63,11 +63,13 @@ class SNORE_EXPORT SnoreCore : public QObject
     Q_OBJECT
 public:
 
+
     /**
      * Creates a Notification Manager SnoreCore
-     * @param trayIcon a QSystemTrayIcon which can later be used by the fallback notification backend.
+     * @param settings a settings instance to store settings of the plugins
+     * @param prefix the prefix to use for all the settings
      */
-    SnoreCore (QSystemTrayIcon *trayIcon = NULL );
+    SnoreCore(QSettings *settings = NULL, const QString &prefix = QString());
     ~SnoreCore();
 
     /**
@@ -155,6 +157,12 @@ public:
     QSystemTrayIcon *trayIcon();
 
     /**
+     * Sets the SystemTrayIcon, needed for ballon notifications.
+     * @param trayIcon
+     */
+    void setTrayIcon(QSystemTrayIcon *trayIcon);
+
+    /**
      * Tries to get an Notification by id.
      * @param id the id of the Notification
      * @return the Notification or an invalid Notification if the Notification was not found
@@ -175,11 +183,16 @@ public:
     bool primaryBackendSupportsRichtext();
 
 
+    QSettings *settings();
+
+    QString settingsPrefix() const;
+
     /**
      *
      * @return a pointer to the private class, for internal use only.
      */
     const SnoreCorePrivate *d();
+
 
 
 signals:

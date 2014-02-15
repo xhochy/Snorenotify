@@ -30,9 +30,11 @@
 
 using namespace Snore;
 
-SnoreCorePrivate::SnoreCorePrivate(QSystemTrayIcon *trayIcon):
-    m_trayIcon(trayIcon),
-    m_defaultApp("SnoreNotify",Icon(":/root/snore.png"))
+SnoreCorePrivate::SnoreCorePrivate(QSettings *settings, const QString &prefix):
+    m_trayIcon(NULL),
+    m_defaultApp("SnoreNotify",Icon(":/root/snore.png")),
+    m_settings(settings),
+    m_settingsPrefix(prefix)
 {
     m_defaultApp.addAlert(Alert("Default",Icon(":/root/snore.png")));
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(slotAboutToQuit()));
