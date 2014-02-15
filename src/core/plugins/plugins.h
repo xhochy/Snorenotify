@@ -70,8 +70,6 @@ private:
     QString m_name;
     bool m_initialized;
     SnoreCore *m_snore;
-
-    QSettings *m_settings;
     QVariantHash m_fallbackSettings;
 
 };
