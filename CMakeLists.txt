@@ -21,7 +21,7 @@ cmake_dependent_option(WITH_FREEDESKTOP_FRONTEND "Build the freedesktop frontend
 #######################################################################
 
 set(SNORE_VERSION_MAJOR 0)
-set(SNORE_VERSION_MINOR 5)
+set(SNORE_VERSION_MINOR 6)
 set(SNORE_VERSION_SUFFIX "pre")
 
 if(WITH_KDE)
