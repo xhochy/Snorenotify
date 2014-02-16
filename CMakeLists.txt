@@ -50,8 +50,6 @@ else()
 endif()
 
 
-find_package( CryptoPP )
-find_package( Boost COMPONENTS system thread)
 
 find_package(Doxygen)
 
