@@ -31,7 +31,8 @@ Using a plugin system it is possible to create notifications with many different
 [![System Tray Notification](http://winkde.org/~pvonreth/other/snore/img/Thumbnail%20Pictures/tray_high.jpg)](http://winkde.org/~pvonreth/other/snore/img/tray.png)
 
 ## Projects using Snore ##
-[Quassel IRC](http://www.quassel-irc.org/)
+* [Quassel IRC](http://www.quassel-irc.org/)
+* [Tomahawk Player](http://www.tomahawk-player.org/)
 
 ## API Doc ##
 [A documentation of the API can be found here](http://winkde.org/~pvonreth/other/snore/doc/html/index.html)
